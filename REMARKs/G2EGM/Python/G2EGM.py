@@ -48,7 +48,11 @@
 
 # %%
 import time
+import numpy as np
 from HARK.G2EGM.mcnab import MCNAB
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sbn
 
 # %%
 # Calibration & Setup
@@ -92,3 +96,44 @@ t = time.time()
 model.solve()
 elapsed = time.time() - t
 print("Solution took %f seconds" % elapsed)
+
+# %% 
+
+def plot_optimal_segment(model, period):
+    
+    # Extract working solution
+    working_sol = model.solution[period].ws
+    
+    # Extract mesh
+    M = working_sol.M
+    N = working_sol.N
+    
+    # Extract boolean arrays indicating what 'segment' is best in each mesh 
+    # point
+    best_ucon = working_sol.ucon[5]
+    best_con = working_sol.con[5]
+    best_acon = working_sol.acon[5]
+    best_dcon = working_sol.dcon[5]
+    
+    indicators = [best_con, best_acon, best_dcon, best_ucon]
+    labels = ['CON','ACON','DCON','UCON']
+    best = np.array([['None']*M.shape[1]]*M.shape[0])
+    for k in range(len(indicators)):
+        best[indicators[k]] = labels[k]
+    
+    # Create a dataframe to pass to seaborn
+    plotData = pd.DataFrame({'M': M.flatten(),
+                             'N': N.flatten(),
+                             'Best': best.flatten()})
+    # Plot
+    sbn.scatterplot(x="M", y="N", hue="Best", data=plotData)
+    plt.show()
+    
+# %%
+T = params['T']
+periods = [T-5, T-19]
+
+for period in periods:
+    plot_optimal_segment(model, period)
+
+
