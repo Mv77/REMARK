@@ -133,6 +133,27 @@ def plot_optimal_segment(model, period):
                     linewidth = 0)
     plt.title('Period: {period}'.format(period = period))
     plt.show()
+
+def plot_retirement_decision(model, period):
+    
+    # Extract working solution
+    sol = model.solution[period]
+    
+    # Extract mesh
+    M = model.grids.M
+    N = model.grids.N
+    
+    # Probability
+    Pr_1 = sol.Pr_1
+    
+    # Plot
+    f, ax = plt.subplots()
+    points = ax.scatter(M, N, c=Pr_1, linewidth = 0)
+    ax.set_title('Period: {period}'.format(period = period))
+    ax.set_xlabel('M')
+    ax.set_ylabel('N')
+    cbar = f.colorbar(points)
+    cbar.set_label('Probability of working')
     
 # %%
 T = params['T']
@@ -141,4 +162,5 @@ periods = [T-5, T-19]
 for period in periods:
     plot_optimal_segment(model, period)
 
-
+for period in periods:
+    plot_retirement_decision(model, period)
