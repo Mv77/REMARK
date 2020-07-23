@@ -115,8 +115,11 @@ def plot_optimal_segment(model, period):
     best_acon = working_sol.acon[5]
     best_dcon = working_sol.dcon[5]
     
-    indicators = [best_con, best_acon, best_dcon, best_ucon]
-    labels = ['CON','ACON','DCON','UCON']
+    # The order in which this is done is very important.
+    # The 'best' matrices are created sequentially. So 'UCON' does not
+    # incorporate 'ACON's values in declaring its the best.
+    indicators = [best_ucon, best_con, best_dcon, best_acon]
+    labels = ['UCON','CON','DCON','ACON']
     best = np.array([['None']*M.shape[1]]*M.shape[0])
     for k in range(len(indicators)):
         best[indicators[k]] = labels[k]
@@ -126,7 +129,9 @@ def plot_optimal_segment(model, period):
                              'N': N.flatten(),
                              'Best': best.flatten()})
     # Plot
-    sbn.scatterplot(x="M", y="N", hue="Best", data=plotData)
+    sbn.scatterplot(x="M", y="N", hue="Best", data=plotData,
+                    linewidth = 0)
+    plt.title('Period: {period}'.format(period = period))
     plt.show()
     
 # %%
