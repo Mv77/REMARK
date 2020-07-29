@@ -97,7 +97,7 @@ model.solve()
 elapsed = time.time() - t
 print("Solution took %f seconds" % elapsed)
 
-# %% 
+# %%
 
 def plot_optimal_segment(model, period):
     
@@ -154,7 +154,28 @@ def plot_retirement_decision(model, period):
     ax.set_ylabel('N')
     cbar = f.colorbar(points)
     cbar.set_label('Probability of working')
+
+def plot_pension_contrib(model, period):
     
+    # Extract working solution
+    sol = model.solution[period].ws
+    
+    # Extract mesh
+    M = model.grids.M
+    N = model.grids.N
+    
+    # Contribution
+    Dmesh = sol.dMesh
+    
+    # Plot
+    f, ax = plt.subplots()
+    points = ax.scatter(M, N, c=Dmesh, linewidth = 0)
+    ax.set_title('Period {period} Pension contribution d'.format(period = period))
+    ax.set_xlabel('M')
+    ax.set_ylabel('N')
+    cbar = f.colorbar(points)
+    cbar.set_label('d: Pension Contribution')
+
 # %%
 T = params['T']
 periods = [T-5, T-19]
@@ -164,3 +185,6 @@ for period in periods:
 
 for period in periods:
     plot_retirement_decision(model, period)
+    
+for period in periods:
+    plot_pension_contrib(model, period)
